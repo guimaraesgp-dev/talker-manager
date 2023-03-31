@@ -33,7 +33,6 @@ app.get('/talker/:id', async (request, response) => {
   return response.status(200).json(idTalker);
 });
 
-
 app.post('/login', (req, res) => {
   try {
     const token = generateToken();
