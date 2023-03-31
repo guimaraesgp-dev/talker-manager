@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const generateToken = require('./utils/generateToken');
 const readData = require('./utils/fsUtils');
 
 const talkerPath = path.resolve(__dirname, 'talker.json');
@@ -30,6 +31,16 @@ app.get('/talker/:id', async (request, response) => {
     });
   }
   return response.status(200).json(idTalker);
+});
+
+
+app.post('/login', (req, res) => {
+  try {
+    const token = generateToken();
+    res.status(200).json({ token });
+  } catch (err) { 
+    res.status(500).send({ message: err.message });
+  }
 });
 
 app.listen(PORT, () => {
