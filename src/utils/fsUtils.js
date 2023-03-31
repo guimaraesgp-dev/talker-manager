@@ -4,8 +4,8 @@ const fs = require('fs').promises;
     try {
         const data = await fs.readFile(path);
         return JSON.parse(data);
-    } catch (err) {
-       console.error(`Arquivo não pôde ser lido: ${error}`);
+    } catch (e) {
+       console.error(`Arquivo não pôde ser lido: ${e}`);
     }
  };
 

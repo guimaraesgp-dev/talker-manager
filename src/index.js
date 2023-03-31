@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const readData = require('./utils/fsUtils');
+
 const talkerPath = path.resolve(__dirname, 'talker.json');
 
 const app = express();
