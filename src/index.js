@@ -11,6 +11,8 @@ const validateTalk = require('./middlewares/validateTalk');
 const validateAuth = require('./middlewares/validateAuth');
 const validateName = require('./middlewares/validateName');
 const validateAge = require('./middlewares/validateAge');
+const validateRateNumber = require('./middlewares/validateRateNumber');
+const validateWatchedDate = require('./middlewares/validateWatchedDate');
 
 const talkerPath = path.resolve(__dirname, 'talker.json');
 
@@ -31,36 +33,41 @@ const PORT = process.env.PORT || '3001';
 
 // não remova esse endpoint, e para o avaliador funcionar
 
-app.get('/talker/search', validateAuth, async (req, res) => {
-  const { q } = req.query;
+app.get('/talker/search', validateAuth, validateRateNumber, validateWatchedDate,  
+async (req, res) => {
+  let data = await readData(talkerPath); 
+  const { q, rate, date } = req.query;
+    if (q) {
+    data = data.filter((talker) => talker.name.toLowerCase().includes(q.toLowerCase()));
+  }
+  if (rate) {
+    data = data.filter((talkerN) => talkerN.talk.rate === Number(rate));
+  }
+  if (date) {
+    data = data.filter((talkerW) => talkerW.talk.watchedAt === date);
+  } 
+  return res.status(200).json(data);
+});
+
+app.get('/', (req, res) => {
+  res.status(HTTP_OK_STATUS).send();
+});
+
+app.get('/talker', async (req, res) => {
   const data = await readData(talkerPath);
-  const searchTalker = data.filter((talker) => talker.name.includes(q));
-  if (!q) {
-    res.status(200).json(data);
-  } else if (!searchTalker) {
-    res.status(200).json([]);
-  } else return res.status(200).json(searchTalker);
+  return res.status(200).json(data);
 });
 
-app.get('/', (_request, response) => {
-  response.status(HTTP_OK_STATUS).send();
-});
-
-app.get('/talker', async (request, response) => {
-  const data = await readData(talkerPath);
-  return response.status(200).json(data);
-});
-
-app.get('/talker/:id', async (request, response) => {
-  const { id } = request.params;
+app.get('/talker/:id', async (req, res) => {
+  const { id } = req.params;
   const data = await readData(talkerPath);
   const idTalker = data.find((talker) => talker.id === Number(id));
   if (!idTalker) {
-    return response.status(404).send({
+    return res.status(404).send({
       message: 'Pessoa palestrante não encontrada',
     });
   }
-  return response.status(200).json(idTalker);
+  return res.status(200).json(idTalker);
 });
 
 app.post('/login', validateEmail, validadePassword, (req, res) => {
@@ -100,12 +107,12 @@ validateRate, validateWatchedAt, async (req, res) => {
   res.status(200).json(editedTalker);
 });
 
-app.delete('/talker/:id', validateAuth, async (request, response) => {
+app.delete('/talker/:id', validateAuth, async (req, res) => {
     const data = await readData(talkerPath); 
-    const { id } = request.params;
+    const { id } = req.params;
     const filterTalker = data.filter((talker) => talker.id !== Number(id));
     await fs.writeFile(talkerPath, JSON.stringify(filterTalker));
-      return response.status(204).end();
+      return res.status(204).end();
   });
 
 app.listen(PORT, () => {
