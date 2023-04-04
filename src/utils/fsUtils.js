@@ -9,4 +9,4 @@ const fs = require('fs').promises;
     }
  };
 
-module.exports =  readData;
+module.exports = readData;
