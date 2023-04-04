@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const generateToken = require('./utils/generateToken');
-// const readData = require('./utils/fsUtils');
 const validateEmail = require('./middlewares/validateEmail');
 const validadePassword = require('./middlewares/validatePassword');
 const validateRate = require('./middlewares/validateRate');
